@@ -1,5 +1,7 @@
-# 使用 Ubuntu 20.04 作为基础镜像
-FROM ubuntu:20.04
+# 使用 Ubuntu 22.04 作为基础镜像
+# Qt for OpenHarmony 在 22.04 上编译,需要 GLIBC_2.33/2.34 与 GLIBCXX_3.4.29,
+# 20.04 的 glibc/libstdc++ 太老会报 "version not found",故基础镜像必须 >= 22.04。
+FROM ubuntu:22.04
 
 # 设置环境变量以避免交互式安装提示
 ENV DEBIAN_FRONTEND=noninteractive
