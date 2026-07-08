@@ -9,6 +9,15 @@ on:
   pull_request:
     branches:
       - main
+  # 手动触发:改了 qt-versions.env 后若不想打 tag,可手动重建镜像。
+  # 推荐做法是打个 git tag(如 qt5.15.12-ohos18-1)以标注 Qt 版本,
+  # 因为 qt-versions.env 是明文,tag 名配合该文件可追溯 Qt 版本。
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -27,9 +36,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # 3. 构建 Docker 镜像
+      #    Qt 下载地址与 SHA256 存于仓库根 qt-versions.env(明文),无需传 secret。
+      #    IMAGE_TAG: 把 git ref 名(tag 触发时是 tag 名,否则是分支名)烙进镜像,
+      #    容器内 cat /opt/image-tag 可查,用于排查"这个镜像是哪个版本构建的"。
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/harmonyos-ci-image:latest .
+          docker build \
+            --build-arg IMAGE_TAG="${GITHUB_REF_NAME:-latest}" \
+            -t ghcr.io/${{ github.repository }}/harmonyos-ci-image:latest .
 
       # 4. 推送 Docker 镜像到 GitHub Package Registry
       - name: Push Docker image
