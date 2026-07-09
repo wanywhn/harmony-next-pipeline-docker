@@ -7,12 +7,17 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 安装必要的工具
+# build-essential 提供 cc/gcc/g++/make/ld:Rust host target(用于编译 build script,
+# 如 proc-macro2/quote)的默认 linker 是 `cc`,交叉编译时 host 仍需系统 cc,
+# 否则报 "linker `cc` not found"。
 RUN apt-get update && \
     apt-get install -y \
         wget \
         unzip \
         openjdk-17-jdk \
         git \
+        build-essential \
+        pkg-config \
         && rm -rf /var/lib/apt/lists/*
 
 # 设置 JDK 17 环境变量
