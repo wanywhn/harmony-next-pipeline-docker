@@ -78,6 +78,19 @@ ENV QT_PREFIX_X86=/opt/qt/x86_64
 ENV QT_PREFIX_AARCH64=/opt/qt/arm64-v8a
 
 # ============================================================================
+# Rust 工具链(rustup)
+# ============================================================================
+# cxx-qt 通过 corrosion 调 cargo 交叉编译 Rust crate 到 OHOS target。
+# 不预装 nightly/target:submodule 的 rust-toolchain.toml 钉了 nightly-2025-12-11,
+# CI 构建时 cargo 会按该文件自动拉取对应 nightly + 所需 OHOS target。
+RUN wget -q -O /tmp/rustup-init.sh https://sh.rustup.rs && \
+    sh /tmp/rustup-init.sh -y --profile minimal --default-toolchain none --no-modify-path && \
+    rm /tmp/rustup-init.sh
+ENV RUSTUP_HOME=/usr/local/rustup
+ENV CARGO_HOME=/usr/local/cargo
+ENV PATH=$CARGO_HOME/bin:$PATH
+
+# ============================================================================
 # 镜像版本烙印:构建时通过 IMAGE_TAG 传入(git ref 名,如 qt5.15.12-ohos18-1)
 # 容器内 cat /opt/image-tag 可查本镜像由哪次构建产出,用于排查 Qt 版本差异。
 # ============================================================================
