@@ -92,6 +92,10 @@ RUN set -a && . /tmp/qt-versions.env && set +a && \
 
 ENV QT_PREFIX_X86=/opt/qt/x86_64
 ENV QT_PREFIX_AARCH64=/opt/qt/arm64-v8a
+# 把 Qt x86_64 的 bin 加进 PATH:lupdate/lrelease 是 host 工具(编译期跑,生成/编译 .ts→.qm),
+# CMake 的 find_program 在 PATH 里找它们,不加 PATH 会 "Could not find LUPDATE_EXECUTABLE"。
+# host 是 x86_64 Linux,故用 x86_64 那套 Qt 的 bin 即可,arm64-v8a 那套的 bin 不需要进 PATH。
+ENV PATH=/opt/qt/x86_64/bin:$PATH
 
 # ============================================================================
 # Rust 工具链(rustup + 预装 OHOS target)
